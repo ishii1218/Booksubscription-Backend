@@ -59,13 +59,14 @@ exports.getCart = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items;
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: products
-      });
+      res.json({ products });
+      // res.render('shop/cart', {
+      //   path: '/cart',
+      //   pageTitle: 'Your Cart',
+      //   products: products
+      // });
     })
-    .catch(err => console.log(err));
+    .catch(err => res.status(500).json({ error: err.message }));
 };
 
 exports.postCart = (req, res, next) => {
@@ -76,7 +77,8 @@ exports.postCart = (req, res, next) => {
     })
     .then(result => {
       console.log(result);
-      res.redirect('/cart');
+      res.json({ result });
+      //res.redirect('/cart');
     });
 };
 
@@ -85,9 +87,10 @@ exports.postCartDeleteProduct = (req, res, next) => {
   req.user
     .removeFromCart(prodId)
     .then(result => {
-      res.redirect('/cart');
+      res.json({ result })
+      //res.redirect('/cart');
     })
-    .catch(err => console.log(err));
+    .catch(err => res.status(500).json({ error: err.message }));
 };
 
 exports.postOrder = (req, res, next) => {
@@ -111,19 +114,21 @@ exports.postOrder = (req, res, next) => {
       return req.user.clearCart();
     })
     .then(() => {
-      res.redirect('/orders');
+      res.json({ message: 'Order created successfully' })
+      //res.redirect('/orders');
     })
-    .catch(err => console.log(err));
+    .catch(err => res.status(500).json({ error: err.message }));
 };
 
 exports.getOrders = (req, res, next) => {
   Order.find({ 'user.userId': req.user._id })
-    .then(orders => {
-      res.render('shop/orders', {
-        path: '/orders',
-        pageTitle: 'Your Orders',
-        orders: orders
-      });
-    })
-    .catch(err => console.log(err));
+    .then
+    (orders => res.json({ orders })
+      // res.render('shop/orders', {
+      //   path: '/orders',
+      //   pageTitle: 'Your Orders',
+      //   orders: orders
+      // });
+    )
+    .catch(err => res.status(500).json({ error: err.message }));
 };
